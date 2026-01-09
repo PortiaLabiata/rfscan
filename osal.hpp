@@ -1,24 +1,13 @@
 #pragma once
+#include "env.hpp"
+#include "osal_class.hpp"
 
-#include "common.hpp"
-namespace OSAL {
-
-class osal_backend_t {
-public:
-	osal_backend_t() = default;
-	~osal_backend_t() = default;
-
-	virtual systime_t millis() = 0;
-	virtual void delay(systime_t ms) = 0;
-	virtual void assert(bool val, const char *reason) = 0;
-};
-
-class disp_backend_t {
-public:
-	disp_backend_t() = default;
-	~disp_backend_t() = default;
-
-	virtual void init() = 0;
-};
-
-}
+#if SITL
+#include "osal_pc.hpp"
+static OSAL::osal_pc_t osal_pc;
+static OSAL::osal_backend_t *osal = &osal_pc;
+#else
+#include "osal_stm32.hpp"
+static OSAL::osal_stm32_t osal_stm32;
+static OSAL::osal_backend_t *osal = &osal_stm32;
+#endif

@@ -1,6 +1,7 @@
 #include "spi.hpp"
 #include "stm32f103xb.h"
 #include "halconf.h"
+#include "osal.hpp"
 
 namespace HAL {
 
@@ -39,7 +40,7 @@ static inline void _spi_setmode(SPI_TypeDef *spi, spi_mode_t mode) {
 }
 
 status_t spidrv_t::cfg(uint32_t freq) {
-	sys::assert(spi == SPI1 || spi == SPI2, "spi invalid driver");
+	osal->assert(spi == SPI1 || spi == SPI2, "spi invalid driver");
 
 	spi->CR1 |= cr1;
 	spi->CR2 |= cr2;
@@ -51,11 +52,11 @@ status_t spidrv_t::cfg(uint32_t freq) {
 		index = (RCC->CFGR & RCC_CFGR_PPRE1) >> 8U;
 	}
 
-	const auto ppre = apb_presc_table[index];
-	sys::assert(ppre != 0, "spi div0");
+	const auto ppre = HAL::apb_presc_table[index];
+	osal->assert(ppre != 0, "spi div0");
 
 	const auto pclk = SystemCoreClock / ppre;	
-	sys::assert(freq * 2 == pclk || freq * 4 == pclk ||
+	osal->assert(freq * 2 == pclk || freq * 4 == pclk ||
 				freq * 8 == pclk || freq * 16 == pclk ||
 				freq * 32 == pclk || freq * 64 == pclk ||
 				freq * 128 == pclk || freq * 256 == pclk,
@@ -80,7 +81,7 @@ status_t spidrv_t::cfg(uint32_t freq) {
 
 void spidrv_t::exchange(uint8_t *txbuf, uint8_t *rxbuf,
 				size_t size) {
-	sys::assert(txbuf != NULL, "null buf");
+	osal->assert(txbuf != NULL, "null buf");
 
 	while (!(spi->SR & SPI_SR_TXE)) ;
 	for (size_t i = 0; i < size; i++) {

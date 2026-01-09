@@ -1,12 +1,11 @@
 add_library(CMSIS OBJECT)
-
 enable_language(ASM C)
 
 set(TOOLCHAIN 
 		/home/portia_labiata/.platformio/packages/toolchain-gccarmnoneeabi/bin)
-set(CMAKE_CXX_COMPILER arm-none-eabi-g++)
-set(CMAKE_C_COMPILER arm-none-eabi-gcc)
-set(CMAKE_ASM_COMPILER arm-none-eabi-gcc)
+set(CMAKE_CXX_COMPILER ${TOOLCHAIN}/arm-none-eabi-g++)
+set(CMAKE_C_COMPILER ${TOOLCHAIN}/arm-none-eabi-gcc)
+set(CMAKE_ASM_COMPILER ${TOOLCHAIN}/arm-none-eabi-gcc)
 
 target_compile_definitions(CMSIS PUBLIC STM32F103xB)
 target_include_directories(CMSIS 

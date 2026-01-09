@@ -1,18 +1,35 @@
 cmake_minimum_required(VERSION 3.13)
-project(rfscan LANGUAGES CXX)
+project(rfscan LANGUAGES CXX C ASM)
 
-set(CMAKE_CXX_COMPILER arm-none-eabi-g++)
+option(SITL "Build fot SITL environment" OFF)
+configure_file(env.hpp.in env.hpp)
+include_directories(${PROJECT_BINARY_DIR})
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+if(NOT SITL)
+	add_subdirectory(bpill)
 
-set(UC_COMPILE_OPTIONS -Wall -Og -mcpu=cortex-m3 
+	set(TOOLCHAIN /home/portia_labiata/.platformio/packages/toolchain-gccarmnoneeabi/bin)
+	set(CMAKE_CXX_COMPILER ${TOOLCHAIN}/arm-none-eabi-g++)
+	set(CMAKE_C_COMPILER ${TOOLCHAIN}/arm-none-eabi-gcc)
+	set(CMAKE_ASM_COMPILER ${TOOLCHAIN}/arm-none-eabi-gcc)
+
+	set(UC_COMPILE_OPTIONS -Wall -Og -mcpu=cortex-m3 
 		-mthumb -mno-thumb-interwork -g)
-set(UC_LINK_OPTIONS 
+	set(UC_LINK_OPTIONS 
 		-Wl,-L${CMAKE_CURRENT_SOURCE_DIR}/bpill,-T./STM32F103XB_FLASH.ld)
+endif()
 
-add_subdirectory(bpill)
-add_executable(${PROJECT_NAME}.elf main.cpp common.cpp gpio.cpp
-	spi.cpp)
-target_link_libraries(${PROJECT_NAME}.elf CMSIS)
-target_compile_options(${PROJECT_NAME}.elf PUBLIC ${UC_COMPILE_OPTIONS})
-target_link_options(${PROJECT_NAME}.elf PUBLIC
+set(COMMON_SOURCES main.cpp common.cpp)
+if(NOT SITL)
+	add_executable(${PROJECT_NAME}.elf ${COMMON_SOURCES} gpio.cpp
+		spi.cpp osal_stm32.cpp disp_stm32.cpp)
+	target_link_libraries(${PROJECT_NAME}.elf CMSIS)
+	target_compile_options(${PROJECT_NAME}.elf PUBLIC ${UC_COMPILE_OPTIONS})
+	target_link_options(${PROJECT_NAME}.elf PUBLIC
 		${UC_COMPILE_OPTIONS} ${UC_LINK_OPTIONS})
+else()
+	find_package(SDL2 REQUIRED)
+	add_executable(sitl ${COMMON_SOURCES} osal_pc.cpp disp_pc.cpp)
+	target_link_libraries(sitl SDL2::SDL2)
+endif()

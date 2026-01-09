@@ -1,6 +1,7 @@
 #pragma once
 #include "common.hpp"
 #include <stddef.h>
+#include "stm32f1xx.h"
 
 namespace HAL {
 

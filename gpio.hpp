@@ -2,8 +2,6 @@
 #include "stm32f103xb.h"
 #include "common.hpp"
 
-using namespace HAL;
-
 namespace HAL {
 
 enum class linemode_t {
