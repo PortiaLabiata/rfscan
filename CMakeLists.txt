@@ -14,7 +14,7 @@ if(NOT SITL)
 	set(CMAKE_C_COMPILER ${TOOLCHAIN}/arm-none-eabi-gcc)
 	set(CMAKE_ASM_COMPILER ${TOOLCHAIN}/arm-none-eabi-gcc)
 
-	set(UC_COMPILE_OPTIONS -Wall -Og -mcpu=cortex-m3 
+	set(UC_COMPILE_OPTIONS -Wall -O0 -mcpu=cortex-m3 
 		-mthumb -mno-thumb-interwork -g)
 	set(UC_LINK_OPTIONS 
 		-Wl,-L${CMAKE_CURRENT_SOURCE_DIR}/bpill,-T./STM32F103XB_FLASH.ld)
@@ -32,4 +32,5 @@ else()
 	find_package(SDL2 REQUIRED)
 	add_executable(sitl ${COMMON_SOURCES} osal_pc.cpp disp_pc.cpp)
 	target_link_libraries(sitl SDL2::SDL2)
+	target_compile_options(sitl PUBLIC -g)
 endif()

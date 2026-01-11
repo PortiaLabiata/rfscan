@@ -15,13 +15,19 @@ template <typename T, size_t cap_>
 class array_t {
 public:
 	array_t() :
-		a(nullptr), _size(0), _cap(cap_) {};
+		_size(0), _cap(cap_) {};
 
 	T *data() const { return a; }
 	size_t size() const { return _size; }
 	size_t cap() const { return _cap; }
 
-	void push(T v) {
+	void push(const T& v) {
+		if (_size < _cap) {
+			a[_size++] = v;
+		}
+	}
+
+	void emplace(const T&& v) {
 		if (_size < _cap) {
 			a[_size++] = v;
 		}
@@ -31,6 +37,10 @@ public:
 		if (_size) _size--;
 		return a[_size]; 
 	}
+	T& last() {
+		return a[_size-1];
+	}
+
 	void reset() { _size = 0; }
 
 	void copy(array_t<T, cap_>& other) {
@@ -38,7 +48,7 @@ public:
 	}
 
 private:
-	T *a;
+	T a[cap_];
 	size_t _size, _cap;
 };
 

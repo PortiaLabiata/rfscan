@@ -1,11 +1,17 @@
 #include "osal_stm32.hpp"
 #include "stm32f103xb.h"
+#include "spi.hpp"
+#include "gpio.hpp"
 
 extern "C" {
 
 static systime_t _ticks = 0;
 void SysTick_Handler(void) {
 	_ticks++;
+}
+
+void HardFault_Handler(void) {
+	while (1) ;
 }
 
 }
@@ -17,6 +23,9 @@ void osal_stm32_t::init() {
 	SystemCoreClockUpdate();
 	SysTick_Config(SystemCoreClock / 1000);
 	NVIC_EnableIRQ(SysTick_IRQn);
+	
+	HAL::spidrv_t::init();
+	HAL::ioline_t::init();
 }
 
 systime_t osal_stm32_t::millis() {

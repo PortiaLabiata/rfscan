@@ -74,6 +74,7 @@ status_t spidrv_t::cfg(uint32_t freq) {
 	_spi_setmode(spi, mode);
 
 	spi->CR1 |= SPI_CR1_MSTR;
+	spi->CR1 |= SPI_CR1_SSM | SPI_CR1_SSI;
 	spi->CR1 |= SPI_CR1_SPE;
 
 	return status_t::ok;
@@ -83,9 +84,8 @@ void spidrv_t::exchange(uint8_t *txbuf, uint8_t *rxbuf,
 				size_t size) {
 	osal->assert(txbuf != NULL, "null buf");
 
-	while (!(spi->SR & SPI_SR_TXE)) ;
 	for (size_t i = 0; i < size; i++) {
-		if (rxbuf) {
+		if (rxbuf && spi->SR & SPI_SR_RXNE) {
 			rxbuf[i] = spi->DR;
 		}
 		while (!(spi->SR & SPI_SR_TXE)) ;

@@ -24,17 +24,22 @@ void disp_pc_t::init() {
 }
 
 void disp_pc_t::draw_area(const disp_backend_t::dirty_t& area) {
-	const auto end_x = area.x + area.size_x();
-	const auto end_y = area.y + area.size_y();
+	osal->assert(area.size_x <= _dirty_maxx &&
+					area.size_y <= _dirty_maxy, "inv dirty");
+
+	osal->assert(area.x >= 0 && area.y >= 0, "inv dirty");
+
+	const auto end_x = area.x + area.size_x;
+	const auto end_y = area.y + area.size_y;
 
 	for (auto i = area.x; i < end_x; i++) {
-		const auto& row = area.area.data()[i];
 		for (auto j = area.y; j < end_y; j++) {
-			const auto pixel = row.data()[j]; 
+			const auto pixel = area.buffer[i][j];
 
-			const auto red = pixel >> 11;
-			const auto green = (pixel >> 5) & 0b111111;
-			const auto blue = pixel & 0b11111;
+			uint8_t red, green, blue;
+			dirty_t::decode_color(pixel, red, green, blue);
+
+			SDL_SetRenderDrawColor(renderer, red, green, blue, 255);
 			const SDL_Rect rect = {static_cast<int>(i)*ZOOM, 
 					static_cast<int>(j)*ZOOM, ZOOM, ZOOM};
 
@@ -53,12 +58,18 @@ void disp_pc_t::flush() {
 			std::exit(0);
 		}
 	}
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+	SDL_RenderClear(renderer);
 
 	while (dirty_stack.size() > 0) {
-		dirty_t area = dirty_stack.pop();
+		const auto area = dirty_stack.pop();
 		draw_area(area);
 	}
 	SDL_RenderPresent(renderer);
+}
+
+void disp_pc_t::clear() {
+	SDL_RenderClear(renderer);
 }
 
 }
