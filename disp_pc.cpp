@@ -32,16 +32,16 @@ void disp_pc_t::draw_area(const disp_backend_t::dirty_t& area) {
 	const auto end_x = area.x + area.size_x;
 	const auto end_y = area.y + area.size_y;
 
-	for (auto i = area.x; i < end_x; i++) {
-		for (auto j = area.y; j < end_y; j++) {
+	for (auto i = 0; i < area.size_x; i++) {
+		for (auto j = 0; j < area.size_y; j++) {
 			const auto pixel = area.buffer[i][j];
 
 			uint8_t red, green, blue;
 			dirty_t::decode_color(pixel, red, green, blue);
 
 			SDL_SetRenderDrawColor(renderer, red, green, blue, 255);
-			const SDL_Rect rect = {static_cast<int>(i)*ZOOM, 
-					static_cast<int>(j)*ZOOM, ZOOM, ZOOM};
+			const SDL_Rect rect = {static_cast<int>(i+area.x)*ZOOM, 
+					static_cast<int>(j+area.y)*ZOOM, ZOOM, ZOOM};
 
 			SDL_RenderFillRect(renderer, &rect);
 		}
