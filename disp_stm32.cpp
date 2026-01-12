@@ -44,11 +44,9 @@ void disp_stm32_t::init() {
 	send_datab(0b01010101);
 	osal->delay(10);
 
-	/*
 	send_commandb(0x36);
 	send_datab(1 << 5);
 	osal->delay(10);
-	*/
 }
 
 void disp_stm32_t::_draw_dirty(const dirty_t& area) {
@@ -60,8 +58,8 @@ void disp_stm32_t::_draw_dirty(const dirty_t& area) {
 
 	send_commandb(0x2C);
 
-	for (auto i = area.x; i < end_x; i++) {
-		for (auto j = area.y; j < end_y; j++) {
+	for (size_t i = 0; i < area.size_x; i++) {
+		for (size_t j = 0; j < area.size_y; j++) {
 			const auto pixel = area.buffer[i][j];	
 			auto pixel_data = ((pixel >> 8) & 0xFF) |
 					((pixel & 0xFF) << 8);

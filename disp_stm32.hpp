@@ -47,7 +47,7 @@ private:
 			static_cast<uint8_t>(end >> 8), 
 			static_cast<uint8_t>(end & 0xFF), 
 		}; 
-		send_commandb(0x2A);
+		send_commandb(cmd);
 		send_data(_buf, sizeof(_buf));
 	}
 

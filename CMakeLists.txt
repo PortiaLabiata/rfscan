@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.13)
 project(rfscan LANGUAGES CXX C ASM)
 
+set(CMAKE_CXX_STANDART 11)
+set(CMAKE_CXX_STANDART_REQUIRED ON)
+
 option(SITL "Build fot SITL environment" OFF)
 configure_file(env.hpp.in env.hpp)
 include_directories(${PROJECT_BINARY_DIR})

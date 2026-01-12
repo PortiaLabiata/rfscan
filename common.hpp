@@ -12,6 +12,12 @@ using status_t = status;
 using freq_t = uint32_t;
 using rssi_t = uint32_t;
 
+inline void *operator new(size_t size, void *ptr) noexcept {
+	(void)size;
+	return ptr;
+}
+inline void operator delete(void*, void*) {}
+
 template <typename T, size_t cap_>
 class array_t {
 public:
@@ -33,10 +39,12 @@ public:
 		}
 	}
 
-	void emplace(const T&& v) {
+	template <typename... Args>
+	void emplace(Args&& ...args) {
 		OS::lock_guard_t guard(sem);
 		if (_size < _cap) {
-			a[_size++] = v;
+			new (&a[_size]) T(args...);
+			_size++;
 		}
 	}
 

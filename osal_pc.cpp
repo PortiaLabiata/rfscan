@@ -1,5 +1,5 @@
 #include "osal_pc.hpp"
-#include <iostream>
+#include <cstdio>
 #include <cstdlib>
 
 namespace OSAL {
@@ -20,8 +20,7 @@ void osal_pc_t::delay(systime_t ms) {
 
 void osal_pc_t::assert(bool v, const char *reason) {
 	if (!v) {
-		std::cout << "Static assertion triggered: " <<
-				reason << std::endl;
+		std::printf("Static assertion failed: %s\n", reason);
 		std::exit(-1);
 	}
 }

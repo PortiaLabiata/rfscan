@@ -25,6 +25,11 @@ public:
 		size_t size_x, size_y;
 		pixel_t buffer[_dirty_maxx][_dirty_maxy];
 
+		dirty_t() = default;
+		dirty_t(size_t _x, size_t _y, size_t _size_x,
+						size_t _size_y) :
+			x(_x), y(_y), size_x(_size_x), size_y(_size_y) {}
+
 		void fill(pixel_t px) {
 			size_t i, j;
 			for (i = 0; i < size_x; i++) {
