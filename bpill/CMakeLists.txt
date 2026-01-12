@@ -7,6 +7,8 @@ set(CMAKE_CXX_COMPILER ${TOOLCHAIN}/arm-none-eabi-g++)
 set(CMAKE_C_COMPILER ${TOOLCHAIN}/arm-none-eabi-gcc)
 set(CMAKE_ASM_COMPILER ${TOOLCHAIN}/arm-none-eabi-gcc)
 
+# Show CMSIS, which chip we are using.
+
 target_compile_definitions(CMSIS PUBLIC STM32F103xB)
 target_include_directories(CMSIS 
 		PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
@@ -21,5 +23,6 @@ target_link_options(CMSIS PUBLIC
 		${UC_COMPILE_OPTIONS} ${UC_LINK_OPTIONS})
 
 target_sources(CMSIS PRIVATE startup_stm32f103xb.s)
+# Syscalls.c file is taken from ChibiOS sources.
 target_sources(CMSIS PRIVATE system_stm32f1xx.c syscalls.c)
 target_link_libraries(CMSIS PUBLIC libarm_cortexM3l_math.a)
