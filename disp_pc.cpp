@@ -3,13 +3,13 @@
 #include <SDL_events.h>
 #include <SDL_render.h>
 #include <SDL_surface.h>
+#include <SDL_video.h>
 
 static const auto ZOOM = 2;
 
 namespace OSAL {
 
 void disp_pc_t::init() {
-	osal->assert(SDL_Init(SDL_INIT_EVERYTHING) == 0, "init"); 
 	window = SDL_CreateWindow("SITL", 
 					SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, \
 					_sizex*ZOOM, _sizey*ZOOM, \
@@ -17,7 +17,7 @@ void disp_pc_t::init() {
 	osal->assert(window != NULL, "window");
 
     renderer = SDL_CreateRenderer(window, -1, 
-					SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
+					SDL_RENDERER_SOFTWARE);
 	osal->assert(renderer != NULL, "renderer");
 
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);	
@@ -52,20 +52,29 @@ void disp_pc_t::flush() {
 	SDL_Event evt;
 	if (SDL_PollEvent(&evt) != 0) {
 		if (evt.type == SDL_QUIT) {
-			SDL_DestroyRenderer(renderer);
-			SDL_DestroyWindow(window);
-			SDL_Quit();
-			std::exit(0);
+			deinit_flag = true;
 		}
 	}
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-	SDL_RenderClear(renderer);
+	bool have_updates = false;
+	if (dirty_stack.size()) {
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+		SDL_RenderClear(renderer);
+		have_updates = true;
+	}
 
 	while (dirty_stack.size() > 0) {
 		const auto area = dirty_stack.pop();
 		draw_area(area);
 	}
-	SDL_RenderPresent(renderer);
+	if (have_updates)
+		SDL_RenderPresent(renderer);
+}
+
+void disp_pc_t::deinit() {
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	SDL_Quit();
+	std::exit(0);
 }
 
 void disp_pc_t::clear() {

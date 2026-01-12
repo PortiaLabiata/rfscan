@@ -18,16 +18,22 @@ if(NOT SITL)
 		-mthumb -mno-thumb-interwork -g)
 	set(UC_LINK_OPTIONS 
 		-Wl,-L${CMAKE_CURRENT_SOURCE_DIR}/bpill,-T./STM32F103XB_FLASH.ld)
+
+	set(FREERTOS_PORT GCC_ARM_CM3)
+	add_compile_options(${UC_COMPILE_OPTIONS})
+	add_link_options(${UC_LINK_OPTIONS})
+	set(FREERTOS_HEAP "2" CACHE STRING "" FORCE)
+	add_library(freertos_config INTERFACE)
+	target_include_directories(freertos_config SYSTEM INTERFACE
+		${CMAKE_CURRENT_SOURCE_DIR})
+	add_subdirectory(FreeRTOS-Kernel)
 endif()
 
 set(COMMON_SOURCES main.cpp common.cpp)
 if(NOT SITL)
 	add_executable(${PROJECT_NAME}.elf ${COMMON_SOURCES} gpio.cpp
 		spi.cpp osal_stm32.cpp disp_stm32.cpp)
-	target_link_libraries(${PROJECT_NAME}.elf CMSIS)
-	target_compile_options(${PROJECT_NAME}.elf PUBLIC ${UC_COMPILE_OPTIONS})
-	target_link_options(${PROJECT_NAME}.elf PUBLIC
-		${UC_COMPILE_OPTIONS} ${UC_LINK_OPTIONS})
+	target_link_libraries(${PROJECT_NAME}.elf CMSIS freertos_kernel)
 else()
 	find_package(SDL2 REQUIRED)
 	add_executable(sitl ${COMMON_SOURCES} osal_pc.cpp disp_pc.cpp)

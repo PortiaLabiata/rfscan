@@ -12,6 +12,10 @@ public:
 	void init() override;
 	void flush() override;
 	void clear() override;
+
+	void deinit();
+	bool deinit_flag = false;
+
 private:
 	void draw_area(const dirty_t& area);
 	SDL_Window *window;

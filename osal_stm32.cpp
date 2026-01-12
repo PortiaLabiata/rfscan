@@ -1,16 +1,19 @@
 #include "osal_stm32.hpp"
+#include "projdefs.h"
 #include "stm32f103xb.h"
 #include "spi.hpp"
 #include "gpio.hpp"
+#include "FreeRTOS.h"
+#include "task.h"
 
 extern "C" {
 
-static systime_t _ticks = 0;
-void SysTick_Handler(void) {
-	_ticks++;
+void HardFault_Handler(void) {
+	while (1) ;
 }
 
-void HardFault_Handler(void) {
+void vApplicationStackOverflowHook(TaskHandle_t task, 
+				char *name) {
 	while (1) ;
 }
 
@@ -29,13 +32,11 @@ void osal_stm32_t::init() {
 }
 
 systime_t osal_stm32_t::millis() {
-	return _ticks;
+	return pdTICKS_TO_MS(xTaskGetTickCount());
 }
 
 void osal_stm32_t::delay(systime_t ms) {
-	const auto now_ms = millis();
-	while (millis() - now_ms <= ms)
-		asm volatile ("nop");
+	vTaskDelay(pdMS_TO_TICKS(ms));
 }
 
 void osal_stm32_t::assert(bool v, const char *reason) {

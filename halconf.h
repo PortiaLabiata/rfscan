@@ -12,4 +12,5 @@
 #define SPI_1 			ON
 #define SPI_2 			OFF
 
-#define DEBUG_ASSERTS ON
+#define DEBUG_ASSERTS 	ON
+#define OS_MAIN_STACKS	1024
