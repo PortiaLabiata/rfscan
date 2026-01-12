@@ -44,17 +44,19 @@ void disp_stm32_t::init() {
 	send_datab(0b01010101);
 	osal->delay(10);
 
+	/*
 	send_commandb(0x36);
 	send_datab(1 << 5);
 	osal->delay(10);
+	*/
 }
 
 void disp_stm32_t::_draw_dirty(const dirty_t& area) {
 	const auto end_x = area.x + area.size_x;
 	const auto end_y = area.y + area.size_y;
 
-	set_column_mode(area.x, end_x);
-	set_row_mode(area.y, end_y);
+	set_column_mode(area.x, end_x-1);
+	set_row_mode(area.y, end_y-1);
 
 	send_commandb(0x2C);
 
@@ -70,8 +72,8 @@ void disp_stm32_t::_draw_dirty(const dirty_t& area) {
 }
 
 void disp_stm32_t::clear() {
-	set_column_mode(0, _sizex);
-	set_row_mode(0, _sizey);
+	set_column_mode(0, _sizex-1);
+	set_row_mode(0, _sizey-1);
 
 	send_commandb(0x2C);
 

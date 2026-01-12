@@ -36,7 +36,7 @@ TASK_FUNC(main_task) {
 		if (disp_pc->deinit_flag)
 			disp_pc->deinit();
 #endif
-		disp->dirty_stack.emplace(x-16, 0, 16, 16);
+		disp->dirty_stack.emplace(x, 0, 1, 16);
 		disp->dirty_stack.last().fill(0x0000);
 		disp->dirty_stack.emplace(x, 0, 16, 16);
 		disp->dirty_stack.last().fill(
@@ -46,7 +46,7 @@ TASK_FUNC(main_task) {
 		if (x > disp->_sizex)
 			x = 0;
 
-		osal->delay(5);
+		osal->delay(20);
 	}
 }
 
