@@ -12,7 +12,7 @@ private:
 	StaticSemaphore_t buf;
 public:
 	mutex_stm32_t() {
-		sem = xSemaphoreCreateBinaryStatic(&buf);
+		sem = xSemaphoreCreateMutexStatic(&buf);
 		xSemaphoreGive(sem);
 	}
 	~mutex_stm32_t() {

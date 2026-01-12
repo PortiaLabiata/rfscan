@@ -8,6 +8,7 @@ using namespace OS;
 
 TASK_FUNC(video_task) {
 	disp->init();
+	disp->clear();
 	while (1) {
 		disp->flush();
 		osal->delay(20);
@@ -28,7 +29,7 @@ TASK_FUNC(main_task) {
 
 		auto& area = disp->dirty_stack.last();
 		area.fill(dirty_t::encode_color(0, 255, 0));
-		osal->delay(100);
+		osal->delay(5);
 	}
 }
 
