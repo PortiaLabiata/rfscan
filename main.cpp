@@ -1,3 +1,4 @@
+#include "mutex_class.hpp"
 #include "osal.hpp"
 #include "peripherals.hpp"
 #include "sched.hpp"
@@ -24,29 +25,40 @@ TASK_FUNC(video_task) {
 	disp->clear();
 	while (1) {
 		disp->flush();
-		osal->delay(20);
+		osal->delay(100);
 	}
 }
 
 TASK_FUNC(main_task) {
-	size_t x = 0;
+	const size_t size = 16;
+	size_t x = size;
+	osal->delay(2000);
 	while (1) {
 #if SITL == ON
 		auto *disp_pc = static_cast<disp_pc_t*>(disp);
 		if (disp_pc->deinit_flag)
 			disp_pc->deinit();
 #endif
-		disp->dirty_stack.emplace(x, 0, 1, 16);
-		disp->dirty_stack.last().fill(0x0000);
-		disp->dirty_stack.emplace(x, 0, 16, 16);
-		disp->dirty_stack.last().fill(
-						dirty_t::encode_color(0, 255, 0));
+		// Will slow things down a bit, but works for now
+		{
+		OS::lock_guard_t guard(disp->dirty_queue);
+		auto *block = disp->dirty_queue.emplace(x, 0, size, 16);
+		auto* clear = disp->dirty_queue.emplace(x-16, 0, size, 16);
 
-		x++;
+		if (block)
+			block->fill(dirty_t::encode_color(0, 255, 0));
+
+		if (clear)
+			clear->fill(0x0000);
+		}
+
+		x+=size;
 		if (x > disp->_sizex)
-			x = 0;
+			x = size;
 
-		osal->delay(20);
+		disp->printf(32, 32, "H E L L O");
+
+		osal->delay(1000);
 	}
 }
 

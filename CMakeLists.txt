@@ -46,7 +46,7 @@ if(NOT SITL)
 	add_subdirectory(FreeRTOS-Kernel)
 endif()
 
-set(COMMON_SOURCES main.cpp common.cpp)
+set(COMMON_SOURCES main.cpp common.cpp draw.cpp)
 add_compile_options(-fno-exceptions -fno-rtti)
 if(NOT SITL)
 	set(ALL_SOURCES ${COMMON_SOURCES} gpio.cpp spi.cpp osal_stm32.cpp
